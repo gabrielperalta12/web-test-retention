@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width, initial-scale=1.0">
-<title>Plataforma Comercial</title>
+<title>Plataforma Comercial — Retención & SOW</title>
 <link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/PapaParse/5.4.1/papaparse.min.js"></script>
 <style>
@@ -167,7 +167,7 @@ td{padding:10px 14px;font-size:13px;vertical-align:middle;overflow:hidden;text-o
   <hr class="kam-divider">
   <p style="font-size:13px;color:var(--text2);margin-bottom:12px">O carga un nuevo archivo de datos</p>
   <div class="drive-row">
-    <input class="drive-input" id="driveUrl" value="https://docs.google.com/spreadsheets/d/1Wv3rURiJzR7iwl8TFguP97bOgerc_sVUUTd8qOhztMg/edit?usp=sharing">
+    <input class="drive-input" id="driveUrl" value="https://docs.google.com/spreadsheets/d/1Wv3rURiJzR7iwl8TFguP97bOgerc_sVUUTd8qOhztMg/export?format=csv">
     <button class="btn-ghost" onclick="loadDrive()">Cargar Drive</button>
     <label class="btn-ghost" style="cursor:pointer">CSV local<input type="file" accept=".csv" id="fileInput" style="display:none"></label>
   </div>
@@ -472,21 +472,25 @@ function toast(msg){
 
 // Carga automática desde Google Sheet
 const SHEET_ID = '1Wv3rURiJzR7iwl8TFguP97bOgerc_sVUUTd8qOhztMg';
-const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv`;
+const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?format=csv&cachebust=${Date.now()}`;
 
 (function autoLoad(){
   const hint = document.getElementById('uploadHint');
   hint.style.display = 'block';
-  hint.textContent = 'Cargando datos...';
-  fetch(SHEET_URL)
+  hint.innerHTML = '<span style="color:var(--text2)">Cargando datos desde Google Sheets...</span>';
+
+  fetch(SHEET_URL, {mode:'cors'})
     .then(r => { if(!r.ok) throw new Error(r.status); return r.text(); })
     .then(t => {
       const result = Papa.parse(t, {header:true, skipEmptyLines:true});
+      if(!result.data.length) throw new Error('vacío');
       init(result.data);
       hint.style.display = 'none';
     })
     .catch(() => {
-      hint.textContent = 'No se pudo cargar automáticamente. Pega la URL manualmente o sube el CSV.';
+      hint.innerHTML = `
+        <strong>No se pudo cargar automáticamente.</strong><br>
+        Asegúrate que el Sheet sea público (Compartir → Cualquiera con el enlace) y prueba con el botón "Cargar Drive".`;
     });
 })();
 </script>
