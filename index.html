@@ -164,14 +164,7 @@ td{padding:10px 14px;font-size:13px;vertical-align:middle;overflow:hidden;text-o
   <h1>Bienvenido</h1>
   <p>¿Quién eres? Verás solo tus leads asignados.</p>
   <div class="kam-grid" id="kamGrid"></div>
-  <hr class="kam-divider">
-  <p style="font-size:13px;color:var(--text2);margin-bottom:12px">O carga un nuevo archivo de datos</p>
-  <div class="drive-row">
-    <input class="drive-input" id="driveUrl" value="https://docs.google.com/spreadsheets/d/1Wv3rURiJzR7iwl8TFguP97bOgerc_sVUUTd8qOhztMg/export?format=csv">
-    <button class="btn-ghost" onclick="loadDrive()">Cargar Drive</button>
-    <label class="btn-ghost" style="cursor:pointer">CSV local<input type="file" accept=".csv" id="fileInput" style="display:none"></label>
-  </div>
-  <div class="hint" id="uploadHint" style="display:none"></div>
+  <div id="uploadHint" style="margin-top:16px;font-size:13px;color:var(--text2);text-align:center"></div>
 </div>
 
 <!-- DASHBOARD -->
@@ -191,7 +184,7 @@ const TODAY = new Date();
 let allData=[], kamData=[], currentKam='', mod='retencion', filt='todos', sF='probabilidad', sD=-1, expanded=null;
 
 document.getElementById('hdrMeta').textContent = TODAY.toLocaleDateString('es-PE',{weekday:'short',day:'numeric',month:'short',year:'numeric'});
-document.getElementById('fileInput').addEventListener('change',e=>{ if(e.target.files[0]) parseFile(e.target.files[0]); });
+
 
 // ── CARGA DE DATOS ─────────────────────────────────────────────────────────
 function parseFile(f){ Papa.parse(f,{header:true,skipEmptyLines:true,complete:r=>init(r.data)}); }
@@ -476,8 +469,8 @@ const SHEET_URL = `https://docs.google.com/spreadsheets/d/${SHEET_ID}/export?for
 
 (function autoLoad(){
   const hint = document.getElementById('uploadHint');
-  hint.style.display = 'block';
-  hint.innerHTML = '<span style="color:var(--text2)">Cargando datos desde Google Sheets...</span>';
+    hint.style.display = 'block';
+    hint.innerHTML = '<span style="color:var(--text2)">Cargando datos desde Google Sheets...</span>';
 
   fetch(SHEET_URL, {mode:'cors'})
     .then(r => { if(!r.ok) throw new Error(r.status); return r.text(); })
